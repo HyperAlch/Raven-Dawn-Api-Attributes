@@ -71,7 +71,6 @@ function query_item_api() {
     }
 
     if (do_api_fetch) {
-
         // Decided the API URL based on mode
         let item_api_url;
         if (api_mode === "test")
@@ -117,11 +116,61 @@ function query_item_api() {
                     fetchStorageSet(storage_name_label, storage_name_value);
                     fetchStorageSet(storage_image_label, storage_image_value);
                 }
+
+                image_item_api();
+                name_item_api();
+
             })
             .catch(console.error);
+
+
+    } else {
+        image_item_api();
+        name_item_api();
     }
 
 
+}
+
+function name_item_api() {
+    const api_query_element = document.querySelector('[data-item-api-fetch]');
+    const name_elements = api_query_element.querySelectorAll('[data-item-api-name]');
+
+    for (const el of name_elements) {
+        const id = el.getAttribute('data-item-api-name');
+
+        if (isNaN(parseInt(id))) return console.error(`Item API: \n\tAttribute: [data-item-api-name] \n\tError: "${id}" is an invalid id`);
+
+        const storage_name_label = `ravendawn_item_api:${id}:name`;
+        let item_name = fetchStorageGet(storage_name_label);
+
+        el.innerHTML = item_name;
+    }
+}
+
+function image_item_api() {
+    const api_query_element = document.querySelector('[data-item-api-fetch]');
+    const image_elements = api_query_element.querySelectorAll('[data-item-api-image]');
+
+    for (const el of image_elements) {
+        const id = el.getAttribute('data-item-api-image');
+
+        if (isNaN(parseInt(id))) return console.error(`Item API: \n\tAttribute: [data-item-api-image] \n\tError: "${id}" is an invalid id`);
+
+        // Create storage name and image labels
+        const storage_name_label = `ravendawn_item_api:${id}:name`;
+        const storage_image_label = `ravendawn_item_api:${id}:image`;
+
+        let item_image_url = fetchStorageGet(storage_image_label);
+        let item_name = fetchStorageGet(storage_name_label);
+
+        let img = document.createElement('img');
+
+        img.setAttribute("src", item_image_url);
+        img.setAttribute("alt", item_name);
+
+        el.replaceWith(img);
+    }
 }
 
 query_item_api();
