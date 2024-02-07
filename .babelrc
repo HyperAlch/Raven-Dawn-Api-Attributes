@@ -10,7 +10,8 @@
                 "exclude": [
                     "error",
                     "warn",
-                    "info"
+                    "info",
+                    "log"
                 ]
             }
         ]

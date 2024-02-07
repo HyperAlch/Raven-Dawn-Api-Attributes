@@ -169,7 +169,14 @@ function image_item_api() {
         img.setAttribute("src", item_image_url);
         img.setAttribute("alt", item_name);
 
-        el.replaceWith(img);
+        const width = el.getAttribute("data-width");
+        const height = el.getAttribute("data-height");
+
+        if (width) img.setAttribute("width", width);
+        if (height) img.setAttribute("height", height);
+
+        if (el.tagName === "SPAN") el.replaceWith(img);
+        if (el.tagName === "DIV") el.appendChild(img);
     }
 }
 
