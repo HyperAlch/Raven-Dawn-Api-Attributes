@@ -25,6 +25,9 @@ function query_item_api() {
     const api_query_element = document.querySelector('[data-item-api-fetch]');
     if (!api_query_element) return;
 
+    // Check if there is more than one [data-item-api-fetch] attribute
+    if (document.querySelectorAll('[data-item-api-fetch]').length > 1) return console.error("Item API: More than one [data-item-api-fetch] tag found");
+
     // Check for and obtain [data-api-mode]
     let api_mode = api_query_element.getAttribute('data-api-mode');
     if (api_mode === "") api_mode = null;
