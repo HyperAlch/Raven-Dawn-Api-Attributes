@@ -51,15 +51,18 @@ function query_item_api() {
         // Create storage name and image labels
         const storage_name_label = `ravendawn_item_api:${id}:name`;
         const storage_image_label = `ravendawn_item_api:${id}:image`;
+        const storage_description_label = `ravendawn_item_api:${id}:description`;
 
         // Check for and obtain the item image url and name from storage
         console.debug(`\tSearching memory for ${storage_name_label}...`);
         console.debug(`\tSearching memory for ${storage_image_label}...`);
+        console.debug(`\tSearching memory for ${storage_description_label}...`);
         let item_image_url = fetchStorageGet(storage_image_label);
         let item_name = fetchStorageGet(storage_name_label);
+        let item_description = fetchStorageGet(storage_description_label);
 
         // If data isn't found, get ready to do an api fetch
-        if (item_image_url && item_name) {
+        if (item_image_url && item_name && item_description) {
             console.debug(`\tData found!!`);
         } else {
             console.debug("\tMissing item details in memory");
@@ -75,7 +78,7 @@ function query_item_api() {
         let item_api_url;
         if (api_mode === "test")
             item_api_url =
-                "https://gray-insufficient-parakeet-558.mypinata.cloud/ipfs/QmXcPwWDzXjS11ek962QukmywRSfy31PKHnLrk9MmiRAsX";
+                "https://cloudflare-ipfs.com/ipfs/QmXcPwWDzXjS11ek962QukmywRSfy31PKHnLrk9MmiRAsX";
         else
             item_api_url = "https://api.ravendawn.online/v1/items";
 
@@ -97,6 +100,7 @@ function query_item_api() {
                     console.debug("\t\tParsing data...");
                     const storage_name_value = target_data[0].name;
                     const storage_image_value = target_data[0].image;
+                    const storage_description_value = target_data[0].description ? target_data[0].description : "Item has no description...";
 
                     // Check for successful parsing
                     if (
@@ -107,26 +111,26 @@ function query_item_api() {
 
                     console.debug(`\t\t\t${storage_name_value}`);
                     console.debug(`\t\t\t${storage_image_value}`);
+                    console.debug(`\t\t\t${storage_description_value}`);
 
                     // Create storage name and image labels
                     const storage_name_label = `ravendawn_item_api:${id}:name`;
                     const storage_image_label = `ravendawn_item_api:${id}:image`;
+                    const storage_description_label = `ravendawn_item_api:${id}:description`;
 
                     // Store parsed data
                     fetchStorageSet(storage_name_label, storage_name_value);
                     fetchStorageSet(storage_image_label, storage_image_value);
+                    fetchStorageSet(storage_description_label, storage_description_value);
                 }
 
-                image_item_api();
-                name_item_api();
-
+                render_item_api();
             })
             .catch(console.error);
 
 
     } else {
-        image_item_api();
-        name_item_api();
+        render_item_api();
     }
 
 
@@ -178,6 +182,28 @@ function image_item_api() {
         if (el.tagName === "SPAN") el.replaceWith(img);
         if (el.tagName === "DIV") el.appendChild(img);
     }
+}
+
+function description_item_api() {
+    const api_query_element = document.querySelector('[data-item-api-fetch]');
+    const description_elements = api_query_element.querySelectorAll('[data-item-api-description]');
+
+    for (const el of description_elements) {
+        const id = el.getAttribute('data-item-api-description');
+
+        if (isNaN(parseInt(id))) return console.error(`Item API: \n\tAttribute: [data-item-api-description] \n\tError: "${id}" is an invalid id`);
+
+        const storage_description_label = `ravendawn_item_api:${id}:description`;
+        let item_name = fetchStorageGet(storage_description_label);
+
+        el.innerHTML = item_name;
+    }
+}
+
+function render_item_api() {
+    image_item_api();
+    name_item_api();
+    description_item_api();
 }
 
 query_item_api();
